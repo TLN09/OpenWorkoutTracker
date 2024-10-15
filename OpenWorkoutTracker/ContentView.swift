@@ -10,26 +10,22 @@ import SwiftData
 
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query private var items: [Item]
+    @Query private var exercises: [Exercise]
 
     var body: some View {
         NavigationSplitView {
             List {
-                ForEach(items) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
-                    } label: {
-                        Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
-                    }
+                ForEach(exercises) { exercise in
+                    Text("\(exercise.name): \(exercise.reps)x\(exercise.sets), \(exercise.weight)")
                 }
-                .onDelete(perform: deleteItems)
+                .onDelete(perform: deleteExercise)
             }
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     EditButton()
                 }
                 ToolbarItem {
-                    Button(action: addItem) {
+                    Button(action: addExercise) {
                         Label("Add Item", systemImage: "plus")
                     }
                 }
@@ -39,17 +35,17 @@ struct ContentView: View {
         }
     }
 
-    private func addItem() {
+    private func addExercise() {
         withAnimation {
-            let newItem = Item(timestamp: Date())
-            modelContext.insert(newItem)
+            let newExercise = Exercise(reps: 0, sets: 0, weight: 0, name: "Exercise")
+            modelContext.insert(newExercise)
         }
     }
 
-    private func deleteItems(offsets: IndexSet) {
+    private func deleteExercise(offsets: IndexSet) {
         withAnimation {
             for index in offsets {
-                modelContext.delete(items[index])
+                modelContext.delete(exercises[index])
             }
         }
     }
@@ -57,5 +53,5 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
-        .modelContainer(for: Item.self, inMemory: true)
+        .modelContainer(for: Exercise.self, inMemory: true)
 }
